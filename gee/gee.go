@@ -17,19 +17,20 @@ func New() *Engine {
 	return &Engine{router: newRouter()}
 }
 
-// 注意是大写GET
+// GET 注意是大写GET
 // GET defines the method to add GET request
-func (engine *Engine) Get(pattern string, handler HandlerFunc) {
+func (engine *Engine) GET(pattern string, handler HandlerFunc) {
 	engine.router.addRoute("GET", pattern, handler)
 }
 
 // POST defines the method to add POST request
-func (engine *Engine) Post(pattern string, handler HandlerFunc) {
+func (engine *Engine) POST(pattern string, handler HandlerFunc) {
 	engine.router.addRoute("POST", pattern, handler)
 }
 
 // Run defines the method to start a http server
 func (engine *Engine) Run(addr string) (err error) {
+	// engin必须实现ServeHTTP方法
 	return http.ListenAndServe(addr, engine)
 }
 

@@ -14,6 +14,7 @@ type Context struct {
 
 	Path   string
 	Method string
+	Params map[string]string
 
 	StatusCode int
 }
@@ -66,7 +67,12 @@ func (c *Context) JSON(code int, obj interface{}) {
 	c.SetHeader("Content-Type", "application/json")
 
 	encoder := json.NewEncoder(c.Writer)
-	if err := encoder.Encode(obj); err != nil{
+	if err := encoder.Encode(obj); err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
 }
