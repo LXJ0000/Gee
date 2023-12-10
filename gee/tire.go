@@ -6,7 +6,7 @@ type node struct {
 	pattern  string  // 设置叶子节点的值，后续用于判断该路由是否存在
 	part     string  // 如果是模糊匹配，则会把当前模糊匹配对应的值赋值给part
 	children []*node // 子节点
-	isWild   bool    // ture则进行模糊匹配
+	isWild   bool    // 当前节点是否进行模糊匹配 ture则进行模糊匹配
 }
 
 // 找第一个匹配的子节点，该方法用于插入
