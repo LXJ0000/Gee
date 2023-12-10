@@ -7,14 +7,54 @@ import (
 // HandlerFunc defines the request handler used by gee
 type HandlerFunc func(*Context)
 
-// Engine implement the interface of ServeHTTP
-type Engine struct {
-	router *router
-}
+type (
+	// Engine implement the interface of ServeHTTP
+	Engine struct {
+		*RouterGroup
+		router *router
+		groups []*RouterGroup
+	}
+
+	RouterGroup struct {
+		prefix     string
+		middleware []HandlerFunc
+		parent     *RouterGroup
+		engine     *Engine
+	}
+)
 
 // New is the constructor of gee.Engine
 func New() *Engine {
-	return &Engine{router: newRouter()}
+	engine := &Engine{router: newRouter()}
+	engine.RouterGroup = &RouterGroup{engine: engine}
+	engine.groups = []*RouterGroup{engine.RouterGroup}
+	return engine
+}
+
+func (group *RouterGroup) Group(prefix string) *RouterGroup {
+	engine := group.engine
+	newGroup := &RouterGroup{
+		prefix: group.prefix + prefix,
+		parent: group,
+		engine: engine,
+	}
+	engine.groups = append(engine.groups, newGroup)
+	return newGroup
+}
+
+func (group *RouterGroup) addRouter(method, comp string, handler HandlerFunc) {
+	pattern := group.prefix + comp
+	group.engine.router.addRoute(method, pattern, handler)
+}
+
+// GET defines the method to add GET request
+func (group *RouterGroup) GET(pattern string, handler HandlerFunc) {
+	group.addRouter("GET", pattern, handler)
+}
+
+// POST defines the method to add POST request
+func (group *RouterGroup) POST(pattern string, handler HandlerFunc) {
+	group.addRouter("POST", pattern, handler)
 }
 
 // GET 注意是大写GET
